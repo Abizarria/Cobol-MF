@@ -1,0 +1,308 @@
+       IDENTIFICATION  DIVISION.
+       PROGRAM-ID.     DYIMPR.
+       AUTHOR.         ADILSON.
+
+       ENVIRONMENT     DIVISION.
+       CONFIGURATION   SECTION.
+       SPECIAL-NAMES.  DECIMAL-POINT         IS  COMMA.
+       FILE-CONTROL.
+
+           SELECT      CADTMP        ASSIGN  TO  DISK
+                       ORGANIZATION          IS  INDEXED
+                       ACCESS        MODE    IS  DYNAMIC
+                       RECORD        KEY     IS  CHV-TMP
+                       FILE          STATUS  IS  FST-TMP.
+
+           SELECT      RELATO  ASSIGN        TO  PRINTER.
+
+       DATA            DIVISION.
+       FILE            SECTION.
+
+       COPY  CADTMP.CPY.
+       COPY  RELATO.CPY.
+
+       WORKING-STORAGE SECTION.
+
+       01  AUXILIARES.
+           03  IND1             PIC  9(02).
+           03  IND2             PIC  9(02).
+           03  FST-TMP          PIC  X(02).
+           03  LIN-AX1          PIC  9(02).
+           03  LIN-AX2          PIC  9(02).
+           03  COL-AX1          PIC  9(02).
+           03  COL-AX2          PIC  9(02).
+           03  COL-AX3          PIC  9(02).
+           03  COL-AX4          PIC  9(02).
+           03  CHV-INI          PIC  9(05).
+           03  NUM-OPC          PIC  9(01).
+
+           03  TAB-OPC.
+               05  FILLER       PIC  X(18)  VALUE " Consulta Monitor ".
+               05  FILLER       PIC  X(18)  VALUE " Emite Impressora ".
+           03  RED-OPC   REDEFINES   TAB-OPC.
+               05  OPC-TAB      PIC  X(18)  OCCURS  02.
+
+           03  REG-TAB          PIC  X(80)  OCCURS  20.
+
+       01  ASC-AUX.
+           03  ASC-001          PIC  X(06)  VALUE  "E".
+           03  ASC-002          PIC  X(06)  VALUE  "(s20H".
+           03  ASC-003          PIC  X(07)  VALUE  "E&l8D".
+
+       01  PRM-MSG.
+           03  IND-MSG          PIC  9(02).
+           03  TCL-MSG          PIC  9(02).
+           03  HEX-MSG          PIC  9(02).
+
+       01  PRM-HLP.
+           03  PRG-HLP          PIC  X(04)  VALUE  "IMPR".
+           03  BCK-HLP          PIC  9(01)  VALUE  3.
+           03  FOR-HLP          PIC  9(01)  VALUE  6.
+           03  LET-HLP          PIC  9(01)  VALUE  7.
+
+       01  PRM-SCR.
+           03  FLG-SCR          PIC  X(01).
+           03  P01-SCR          PIC  X(01).
+           03  P02-SCR          PIC S9(04).
+           03  POS-SCR.
+               05  LIN-SCR      PIC  9(02)  COMP-X.
+               05  COL-SCR      PIC  9(02)  COMP-X.
+           03  P03-SCR          PIC X(2000).
+           03  P04-SCR          PIC X(2000).
+           03  P05-SCR          PIC  9(04)  COMP-X.
+
+       01  PRM-PRN.
+           03  TST-PRN          PIC  9(02)  COMP-X  VALUE  ZEROS.
+           03  STS-PRN          PIC  9(02)  COMP-X  VALUE  ZEROS.
+
+       LINKAGE         SECTION.
+
+       01  PRM-IMP.
+           03  ARQ-IMP          PIC  9(06).
+           03  PAG-IMP          PIC  9(03).
+           03  FLG-IMP          PIC  9(01).
+           03  LIN-IMP          PIC  9(02).
+           03  CL1-IMP          PIC  9(02).
+           03  CL2-IMP          PIC  9(02).
+
+       SCREEN          SECTION.
+
+       01  TELA-01  BCK-CLR 05 FOR-CLR 11.
+           03  LINE LIN-IMP COLUMN CL1-IMP VALUE
+               " ษอออออ        อออออป ".
+           03  LINE PLUS 01 COLUMN CL1-IMP VALUE
+               " บ                    บ ".
+           03  BCK-CLR 0 VALUE "  ".
+           03  LINE PLUS 01 COLUMN CL1-IMP VALUE
+               " บ                    บ ".
+           03  BCK-CLR 0 VALUE "  ".
+           03  LINE PLUS 01 COLUMN CL1-IMP VALUE
+               " ศออออออออออออออออออออผ ".
+           03  BCK-CLR 0 VALUE "  ".
+           03  LINE PLUS 01 COLUMN COL-AX1 PIC X(24) FROM SPACES
+               BCK-CLR 0.
+           03  LINE LIN-IMP COLUMN COL-AX2 VALUE "Opไes" FOR-CLR 14.
+
+       01  TELA-02  BCK-CLR 7 FOR-CLR 0.
+           03  LINE 04 COLUMN 01 PIC X(80) FROM REG-TAB (01).
+           03  LINE 05 COLUMN 01 PIC X(80) FROM REG-TAB (02).
+           03  LINE 06 COLUMN 01 PIC X(80) FROM REG-TAB (03).
+           03  LINE 07 COLUMN 01 PIC X(80) FROM REG-TAB (04).
+           03  LINE 08 COLUMN 01 PIC X(80) FROM REG-TAB (05).
+           03  LINE 09 COLUMN 01 PIC X(80) FROM REG-TAB (06).
+           03  LINE 10 COLUMN 01 PIC X(80) FROM REG-TAB (07).
+           03  LINE 11 COLUMN 01 PIC X(80) FROM REG-TAB (08).
+           03  LINE 12 COLUMN 01 PIC X(80) FROM REG-TAB (09).
+           03  LINE 13 COLUMN 01 PIC X(80) FROM REG-TAB (10).
+           03  LINE 14 COLUMN 01 PIC X(80) FROM REG-TAB (11).
+           03  LINE 15 COLUMN 01 PIC X(80) FROM REG-TAB (12).
+           03  LINE 16 COLUMN 01 PIC X(80) FROM REG-TAB (13).
+           03  LINE 17 COLUMN 01 PIC X(80) FROM REG-TAB (14).
+           03  LINE 18 COLUMN 01 PIC X(80) FROM REG-TAB (15).
+           03  LINE 19 COLUMN 01 PIC X(80) FROM REG-TAB (16).
+           03  LINE 20 COLUMN 01 PIC X(80) FROM REG-TAB (17).
+           03  LINE 21 COLUMN 01 PIC X(80) FROM REG-TAB (18).
+           03  LINE 22 COLUMN 01 PIC X(80) FROM REG-TAB (19).
+           03  LINE 23 COLUMN 01 PIC X(80) FROM REG-TAB (20).
+
+       01  TELA-03  BCK-CLR 1 FOR-CLR 15.
+           03  LINE LIN-AX2 COLUMN COL-AX4 PIC X(30) FROM
+               "  Emitindo P gina ฤ    /     ".
+           03  PAG-T03 LINE LIN-AX2 COLUMN CL2-IMP
+                            PIC 9(03) FROM PAG-TMP.
+           03  TOT-T03 LINE LIN-AX2 COLUMN PLUS 02
+                            PIC 9(03) FROM PAG-IMP.
+       01  SETA-01.
+           03  LINE LIN-AX1 COLUMN COL-AX3 PIC X(18) FROM OPC-TAB (1)
+                    BCK-CLR 07 FOR-CLR 12.
+           03  LINE PLUS 01 COLUMN COL-AX3 PIC X(18) FROM OPC-TAB (2)
+                    BCK-CLR 05 FOR-CLR 15.
+
+       01  SETA-02.
+           03  LINE LIN-AX1 COLUMN COL-AX3 PIC X(18) FROM OPC-TAB (1)
+                    BCK-CLR 05 FOR-CLR 15.
+           03  LINE PLUS 01 COLUMN COL-AX3 PIC X(18) FROM OPC-TAB (2)
+                    BCK-CLR 07 FOR-CLR 12.
+
+       PROCEDURE       DIVISION  USING  PRM-IMP.
+
+       ROT-0000-00.
+           OPEN     INPUT        CADTMP
+           MOVE     1        TO  NUM-OPC
+           COMPUTE  LIN-AX1  =   LIN-IMP  +  01
+           COMPUTE  LIN-AX2  =   LIN-IMP  -  01
+           COMPUTE  COL-AX1  =   CL1-IMP  +  02
+           COMPUTE  COL-AX2  =   CL1-IMP  +  09
+           COMPUTE  COL-AX3  =   CL1-IMP  +  03
+           COMPUTE  COL-AX4  =   CL2-IMP  -  21
+           PERFORM  ROT-GTLA-00.
+
+       ROT-PESQ-00.
+           DISPLAY  TELA-01      SETA-01.
+
+       ROT-PESQ-10.
+           MOVE  1  TO  IND-MSG  PERFORM  ROT-MSGM-00
+           IF  TCL-MSG   =   01  PERFORM  ROT-HELP-00
+                                 GO       ROT-PESQ-10.
+           IF  TCL-MSG = 5 OR 6  PERFORM  ROT-PESQ-20
+                                 GO       ROT-PESQ-10.
+           IF  TCL-MSG   >   00  GO       ROT-PESQ-10.
+           IF  HEX-MSG   =   27  PERFORM  ROT-RTLA-00
+                                 GO       ROT-EXIT-00.
+           IF  NUM-OPC   =    1  GO       ROT-TELA-00.
+           IF  NUM-OPC   =    2  GO       ROT-IMPR-00.
+
+       ROT-PESQ-20.
+           EVALUATE NUM-OPC
+               WHEN     1        MOVE  2  TO  NUM-OPC
+                                 DISPLAY      SETA-02
+               WHEN     2        MOVE  1  TO  NUM-OPC
+                                 DISPLAY      SETA-01
+           END-EVALUATE.
+
+       ROT-TELA-00.
+           MOVE     ZEROS    TO  CHV-INI
+           MOVE     1        TO  IND1     IND2.
+
+       ROT-TELA-10.
+           MOVE     CHV-INI  TO  CHV-TMP
+           START    CADTMP       KEY  >   CHV-TMP.
+
+       ROT-TELA-20.
+           READ     CADTMP   NEXT
+           IF  FST-TMP   =   "10"  PERFORM  ROT-TELA-50
+                                   GO       ROT-TELA-30.
+           MOVE     DET-TMP (IND2: 80)  TO  REG-TAB    (IND1)
+           IF  IND1      <    20   ADD   1  TO  IND1
+                                   GO       ROT-TELA-20.
+       ROT-TELA-30.
+           MOVE     1   TO   IND1  DISPLAY  TELA-02.
+
+       ROT-TELA-40.
+           MOVE  9  TO  IND-MSG  PERFORM  ROT-MSGM-00
+           IF  TCL-MSG   =   01  PERFORM  ROT-HELP-00
+                                 GO       ROT-TELA-40.
+           IF  TCL-MSG   =   03  GO       ROT-TCLA-03.
+           IF  TCL-MSG   =   04  GO       ROT-TCLA-04.
+           IF  TCL-MSG   =   05  GO       ROT-TCLA-05.
+           IF  TCL-MSG   =   06  GO       ROT-TCLA-06.
+           IF  TCL-MSG   =   07  GO       ROT-TCLA-07.
+           IF  TCL-MSG   =   10  GO       ROT-TCLA-10.
+           IF  TCL-MSG   =   53  GO       ROT-TCLA-53.
+           IF  TCL-MSG   =   54  GO       ROT-TCLA-54.
+           IF  TCL-MSG   >   00  GO       ROT-TELA-40.
+           IF  HEX-MSG   =   13  GO       ROT-TELA-40.
+           PERFORM  ROT-RTLA-00  GO       ROT-PESQ-00.
+
+       ROT-TELA-50.
+           MOVE     SPACES  TO   REG-TAB     (IND1)
+           IF  IND1    <    20   ADD   1  TO  IND1
+                                 GO       ROT-TELA-50.
+       ROT-TCLA-03.
+           IF  IND2    =    01   GO       ROT-TELA-40.
+           SUBTRACT 1 FROM IND2  GO       ROT-TELA-10.
+
+       ROT-TCLA-04.
+           IF  IND2    =    58   GO       ROT-TELA-40.
+           ADD      1  TO  IND2  GO       ROT-TELA-10.
+
+       ROT-TCLA-05.
+           IF  CHV-INI  =    0   GO       ROT-TELA-40.
+           COMPUTE  CHV-INI  =   CHV-INI  -  1
+                                 GO       ROT-TELA-10.
+       ROT-TCLA-06.
+           START    CADTMP       KEY  >   CHV-TMP
+                    INVALID      KEY  GO  ROT-TELA-40.
+           COMPUTE  CHV-INI  =   CHV-INI  +  1
+                                 GO       ROT-TELA-10.
+       ROT-TCLA-07.
+           IF  IND2   =     01   GO       ROT-TELA-40.
+           MOVE     01  TO IND2  GO       ROT-TELA-10.
+
+       ROT-TCLA-10.
+           IF  IND2   =     58   GO       ROT-TELA-40.
+           MOVE     58  TO IND2  GO       ROT-TELA-10.
+
+       ROT-TCLA-53.
+           IF  CHV-INI   =    0  GO       ROT-TELA-40.
+           IF  CHV-INI   >   20  COMPUTE  CHV-INI  =
+                                          CHV-INI  -  20
+           ELSE
+                                 MOVE  0  TO  CHV-INI.
+           GO       ROT-TELA-10.
+
+       ROT-TCLA-54.
+           START    CADTMP       KEY  >   CHV-TMP
+                    INVALID      KEY  GO  ROT-TELA-40.
+           COMPUTE  CHV-INI  =   CHV-INI  +   20
+                                 GO       ROT-TELA-10.
+
+       ROT-IMPR-00.
+           CALL "PC_TEST_PRINTER"  USING      TST-PRN
+                                              STS-PRN
+           IF  STS-PRN NOT = 144 MOVE 33  TO  IND-MSG
+                                 PERFORM  ROT-MSGM-00
+                                 GO       ROT-PESQ-10.
+           OPEN      OUTPUT      RELATO
+           MOVE      ZEROS   TO  CHV-TMP  PAG-TMP
+           START     CADTMP      KEY  >   CHV-TMP.
+
+       ROT-IMPR-10.
+           PERFORM  ROT-RTLA-00  DISPLAY  TELA-03
+           IF  FLG-IMP   =    1  WRITE    REG-REL FROM ASC-001 AFTER 0.
+           IF  FLG-IMP   =    2  WRITE    REG-REL FROM ASC-002 AFTER 0.
+           IF  FLG-IMP   =    3  WRITE    REG-REL FROM ASC-003 AFTER 0.
+
+       ROT-IMPR-20.
+           READ     CADTMP  NEXT CALL     "DYHORA"
+           IF  FST-TMP   =  "10" GO       ROT-IMPR-40.
+           IF  LIN-TMP   =   01  PERFORM  ROT-IMPR-30
+                                 GO       ROT-IMPR-20.
+           IF  LIN-TMP   >   90  GO       ROT-IMPR-20.
+           WRITE    REG-REL FROM DET-TMP
+           DISPLAY  PAG-T03      GO       ROT-IMPR-20.
+
+       ROT-IMPR-30.
+           IF  PAG-TMP   =    1  WRITE REG-REL FROM DET-TMP AFTER 0.
+           IF  PAG-TMP   >    1  WRITE REG-REL FROM DET-TMP AFTER PAGE.
+
+       ROT-IMPR-40.
+           WRITE    REG-REL FROM ASC-001  AFTER  0
+           CLOSE    RELATO       GO       ROT-EXIT-00.
+
+       ROT-MSGM-00.
+           CALL     "DYMSGM"     USING  PRM-MSG.
+
+       ROT-HELP-00.
+           CALL     "DYHELP"     USING  PRM-HLP.
+
+       ROT-GTLA-00.
+           MOVE     "G"      TO  FLG-SCR
+           CALL     "DYTELA"     USING  PRM-SCR.
+
+       ROT-RTLA-00.
+           MOVE     "R"      TO  FLG-SCR
+           CALL     "DYTELA"     USING  PRM-SCR.
+
+       ROT-EXIT-00.
+           CLOSE     CADTMP      GOBACK.
